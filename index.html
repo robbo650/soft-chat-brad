@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Central de Atendimento</title>
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Supabase via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+</head>
+<body>
+  <div class="chat-container">
+    <!-- Cabeçalho com logo -->
+    <header class="fundo-bradesco">
+      <img src="logo-bradesco.png" alt="Logo Bradesco" class="logo">
+      <div class="header-text">
+        <h1 class="logo-bradesco">Central de Atendimento</h1>
+        <p class="texto-padrao">Atendimento seguro e individual</p>
+      </div>
+    </header>
+
+    <!-- Área de mensagens -->
+    <div id="chat" class="chat-box"></div>
+
+    <!-- Rodapé com aviso e campo de envio -->
+    <footer>
+      <p class="alert texto-padrao">Esta conversa é monitorada para fins de segurança</p>
+      <div class="input-area">
+        <input id="mensagem" type="text" placeholder="Digite sua mensagem...">
+        <button id="enviar" class="fundo-bradesco">Enviar</button>
+      </div>
+    </footer>
+  </div>
+
+  <!-- 🔹 Script carregado no final do body -->
+  <script src="chat.js"></script>
+</body>
+</html>
