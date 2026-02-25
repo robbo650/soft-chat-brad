@@ -1,4 +1,3 @@
-// Usando Supabase via CDN
 const { createClient } = supabase;
 
 const supabaseUrl = "https://robbo650.supabase.co";
@@ -7,80 +6,30 @@ const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
 let conversaId = null;
 
-// Função para gerar número de protocolo único (usado como cliente_id)
-function gerarProtocolo() {
-  const agora = Date.now();
-  const aleatorio = Math.floor(Math.random() * 1000000);
-  return `${agora}${aleatorio}`;
-}
-
-// Renderizar mensagem no chat
-function renderMensagem(msg) {
-  const div = document.createElement('div');
-  div.classList.add('mensagem');
-
-  if (msg.remetente === "cliente") {
-    div.classList.add('mensagem-cliente');
-  } else if (msg.remetente === "atendente") {
-    div.classList.add('mensagem-admin');
-  } else {
-    div.classList.add('mensagem-sistema');
-  }
-
-  const dataHora = new Date(msg.criado_em).toLocaleTimeString("pt-BR", {
-    hour: "2-digit",
-    minute: "2-digit"
-  });
-
-  div.innerHTML = `
-    <p>${msg.mensagem}</p>
-    <small>${dataHora}</small>
-  `;
-
-  const chatBox = document.getElementById("chat");
-  chatBox.appendChild(div);
-  chatBox.scrollTop = chatBox.scrollHeight;
-}
-
-// Criar conversa automática ao abrir o chat
-async function criarConversa() {
-  const protocolo = gerarProtocolo();
+// Criar nova conversa ao abrir
+async function iniciarConversa() {
   const { data, error } = await supabaseClient
     .from('conversas')
-    .insert([{ cliente_id: protocolo }]) // usa cliente_id em vez de protocolo
+    .insert([{ cliente_id: "cliente", criado_em: new Date().toISOString() }])
     .select();
 
-  if (!error && data.length > 0) {
-    conversaId = data[0].id; // uuid da conversa
-  } else {
-    console.error("Erro ao criar conversa:", error);
+  if (error) {
+    console.error("Erro ao iniciar conversa:", error);
+    return;
   }
 
-  // mostra saudação uma vez
-  renderMensagem({
-    remetente: "Sistema",
-    mensagem: `👋 Bem-vindo à Central de Atendimento! Seu número de protocolo é: ${protocolo}`,
-    criado_em: new Date().toISOString()
-  });
+  conversaId = data[0].id;
 }
 
 // Enviar mensagem do cliente
 async function enviarMensagem(texto) {
-  // renderiza imediatamente
-  renderMensagem({
-    remetente: "cliente",
-    mensagem: texto,
-    criado_em: new Date().toISOString()
-  });
-
   if (!conversaId) {
-    console.warn("Conversa ainda não criada, aguardando...");
-    return;
+    await iniciarConversa();
   }
 
   const { error } = await supabaseClient.from('mensagens').insert([
     {
-      conversa_id: conversaId, // uuid
+      conversa_id: conversaId,
       remetente: "cliente",
       mensagem: texto,
       criado_em: new Date().toISOString()
@@ -89,25 +38,17 @@ async function enviarMensagem(texto) {
 
   if (error) {
     console.error("Erro ao enviar mensagem:", error);
+  } else {
+    const chatBox = document.getElementById("chat-box");
+    const div = document.createElement("div");
+    div.classList.add("mensagem", "mensagem-cliente");
+    div.innerHTML = `<p>${texto}</p><small>${new Date().toLocaleTimeString("pt-BR")}</small>`;
+    chatBox.appendChild(div);
   }
 }
 
-// Receber mensagens em tempo real (do atendente)
-supabaseClient
-  .channel('mensagens')
-  .on(
-    'postgres_changes',
-    { event: 'INSERT', schema: 'public', table: 'mensagens' },
-    (payload) => {
-      if (payload.new.remetente === "atendente") {
-        renderMensagem(payload.new);
-      }
-    }
-  )
-  .subscribe();
-
-// Configura botão de envio
-document.getElementById("enviar").addEventListener("click", () => {
+// Configura botão
+document.getElementById("enviarMensagem").addEventListener("click", () => {
   const input = document.getElementById("mensagem");
   const texto = input.value.trim();
   if (texto) {
@@ -116,7 +57,7 @@ document.getElementById("enviar").addEventListener("click", () => {
   }
 });
 
-// Configura envio com Enter
+// Enter também envia
 document.getElementById("mensagem").addEventListener("keypress", (event) => {
   if (event.key === "Enter") {
     event.preventDefault();
@@ -128,7 +69,25 @@ document.getElementById("mensagem").addEventListener("keypress", (event) => {
   }
 });
 
-// Saudação automática ao abrir
-window.onload = () => {
-  criarConversa();
+// Tempo real: ouvir respostas do atendente
+supabaseClient
+  .channel('mensagens')
+  .on(
+    'postgres_changes',
+    { event: 'INSERT', schema: 'public', table: 'mensagens' },
+    (payload) => {
+      if (payload.new.remetente === "atendente" && payload.new.conversa_id === conversaId) {
+        const chatBox = document.getElementById("chat-box");
+        const div = document.createElement("div");
+        div.classList.add("mensagem", "mensagem-admin");
+        div.innerHTML = `<p>${payload.new.mensagem}</p><small>${new Date(payload.new.criado_em).toLocaleTimeString("pt-BR")}</small>`;
+        chatBox.appendChild(div);
+      }
+    }
+  )
+  .subscribe();
+
+// Inicia conversa ao abrir
+window.onload = async () => {
+  await iniciarConversa();
 };
