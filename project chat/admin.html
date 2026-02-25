@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Painel do Atendente</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+</head>
+<body>
+  <div class="chat-container">
+    <header class="fundo-bradesco">
+      <h1 class="logo-bradesco">Painel do Atendente</h1>
+    </header>
+
+    <!-- Área dividida -->
+    <div class="chat-box" style="display:flex; gap:20px;">
+      
+      <!-- Lista de conversas -->
+      <div id="lista-conversas" style="width:30%; border-right:1px solid #ccc; padding:10px; overflow-y:auto;">
+        <h3>Conversas</h3>
+        <!-- clientes aparecem aqui -->
+      </div>
+
+      <!-- Mensagens da conversa selecionada -->
+      <div id="mensagens" style="width:70%; padding:10px; overflow-y:auto;">
+        <h3>Mensagens</h3>
+        <!-- mensagens aparecem aqui -->
+      </div>
+    </div>
+
+    <!-- Campo para responder -->
+    <footer>
+      <div class="input-area">
+        <input id="resposta" type="text" placeholder="Digite sua resposta...">
+        <button id="enviarResposta" class="fundo-bradesco">Responder</button>
+      </div>
+    </footer>
+  </div>
+
+  <!-- 🔹 Aqui carregamos o script correto do atendente -->
+  <script src="admin.js"></script>
+</body>
+</html>

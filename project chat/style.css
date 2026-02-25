@@ -1,0 +1,119 @@
+/* Identidade visual Bradesco */
+.logo-bradesco { color: #CC0000; }
+.fundo-bradesco { background-color: #CC0000; }
+.texto-padrao { color: #333333; }
+
+/* Layout geral */
+body {
+  font-family: 'Roboto', Arial, sans-serif;
+  margin: 0;
+  height: 100dvh; /* 🔹 dynamic viewport height para celular */
+  background: #f5f5f5; /* fundo branco/cinza claro */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow-x: hidden; /* remove barra lateral */
+}
+
+.chat-container {
+  width: 100%;
+  max-width: 500px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  height: 100dvh; /* 🔹 ocupa toda a tela mesmo com teclado */
+}
+
+/* Cabeçalho */
+header {
+  background: #CC0000;
+  color: #fff;
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+header .logo { width: 40px; height: auto; }
+.header-text h1 { margin: 0; font-size: 18px; }
+.header-text p { margin: 0; font-size: 14px; }
+
+/* Área de mensagens */
+.chat-box {
+  flex: 1;
+  padding: 15px;
+  overflow-y: auto;
+  background: #fafafa;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Bolhas de mensagem */
+.mensagem {
+  padding: 10px 15px;
+  border-radius: 20px;
+  margin: 5px 0;
+  max-width: 75%;
+  word-wrap: break-word;
+  font-size: 14px;
+}
+.mensagem-cliente {
+  background: #CC0000;
+  color: #fff;
+  margin-left: auto;
+}
+.mensagem-admin {
+  background: #e0e0e0;
+  margin-right: auto;
+}
+.mensagem-sistema {
+  background: #d9d9d9;
+  color: #000;
+  border-radius: 10px;
+  margin: 10px auto;
+  text-align: center;
+  font-style: italic;
+  max-width: 90%;
+}
+.mensagem small {
+  font-size: 10px;
+  color: #666;
+  display: block;
+  margin-top: 3px;
+  text-align: right;
+}
+
+/* Rodapé */
+footer { padding: 10px; background: #f0f0f0; }
+.input-area { display: flex; gap: 10px; }
+input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 20px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+button {
+  background: #CC0000;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+/* 🔹 Ajustes para celular */
+@media (max-width: 600px) {
+  .chat-container {
+    max-width: 100%;
+    border-radius: 0;
+    height: 100dvh; /* 🔹 ocupa toda a tela mesmo com teclado */
+  }
+  .chat-box { padding: 10px; }
+  .mensagem { font-size: 14px; max-width: 85%; }
+  input { font-size: 14px; padding: 8px; }
+  button { font-size: 14px; padding: 8px 15px; }
+}
