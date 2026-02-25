@@ -1,8 +1,9 @@
 const { createClient } = supabase;
 
-const supabaseUrl = "https://robbo650.supabase.co";
-const supabaseKey = "sb_publishable_Uu2hqzHDVy4ds2xc-quI8g_jceg9J3C";
+const supabaseUrl = "https://ogvhrkptvvtiddqumdqh.supabase.co"; // Project URL do painel
+const supabaseKey = "sb_publishable_Uu2hqzHDVy4ds2xc-quI8g_jceg9J3C"; // Publishable key (anon)
 const supabaseClient = createClient(supabaseUrl, supabaseKey);
+
 
 let conversaSelecionada = null;
 
@@ -139,3 +140,4 @@ window.onload = async () => {
     selecionarConversa(conversaSelecionada);
   }
 };
+
