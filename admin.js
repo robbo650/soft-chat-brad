@@ -75,7 +75,12 @@ async function enviarResposta(texto) {
   if (error) {
     console.error("Erro ao enviar resposta:", error);
   } else {
-    selecionarConversa(conversaSelecionada); // recarrega mensagens
+    // adiciona direto na tela sem recarregar tudo
+    const mensagensBox = document.getElementById("mensagens");
+    const div = document.createElement("div");
+    div.classList.add("mensagem", "mensagem-admin");
+    div.innerHTML = `<p>${texto}</p><small>${new Date().toLocaleTimeString("pt-BR")}</small>`;
+    mensagensBox.appendChild(div);
   }
 }
 
@@ -109,7 +114,11 @@ supabaseClient
     { event: 'INSERT', schema: 'public', table: 'mensagens' },
     (payload) => {
       if (payload.new.remetente === "cliente" && payload.new.conversa_id === conversaSelecionada) {
-        selecionarConversa(conversaSelecionada);
+        const mensagensBox = document.getElementById("mensagens");
+        const div = document.createElement("div");
+        div.classList.add("mensagem", "mensagem-cliente");
+        div.innerHTML = `<p>${payload.new.mensagem}</p><small>${new Date(payload.new.criado_em).toLocaleTimeString("pt-BR")}</small>`;
+        mensagensBox.appendChild(div);
       }
     }
   )
