@@ -5,15 +5,14 @@ const supabaseKey = "sb_publishable_Uu2hqzHDVy4ds2xc-quI8g_jceg9J3C";
 const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
 let conversaId = null;
-const clienteId = crypto.randomUUID(); // ID único para cada cliente
-const protocolo = gerarProtocolo();    // protocolo numérico dinâmico
+const clienteId = crypto.randomUUID(); 
+const protocolo = gerarProtocolo();    
 
-// Função para gerar protocolo numérico
 function gerarProtocolo() {
   const agora = new Date();
-  const protocolo = agora.getFullYear().toString().slice(-2) + // ano (26)
-                    (agora.getMonth()+1).toString().padStart(2,"0") + // mês
-                    agora.getDate().toString().padStart(2,"0") + // dia
+  const protocolo = agora.getFullYear().toString().slice(-2) +
+                    (agora.getMonth()+1).toString().padStart(2,"0") +
+                    agora.getDate().toString().padStart(2,"0") +
                     agora.getHours().toString().padStart(2,"0") +
                     agora.getMinutes().toString().padStart(2,"0") +
                     agora.getSeconds().toString().padStart(2,"0") +
@@ -21,7 +20,6 @@ function gerarProtocolo() {
   return protocolo; 
 }
 
-// Função para saudação conforme horário
 function saudacaoHorario() {
   const hora = new Date().getHours();
   if (hora < 12) return "Bom dia,";
@@ -29,7 +27,6 @@ function saudacaoHorario() {
   return "Boa noite,";
 }
 
-// Criar nova conversa ao abrir
 async function iniciarConversa() {
   const { data, error } = await supabaseClient
     .from('conversas')
@@ -42,9 +39,7 @@ async function iniciarConversa() {
   }
 
   conversaId = data[0].id;
-  console.log("Conversa iniciada com ID:", conversaId);
 
-  // Saudação automática com protocolo e pedido do nome
   const mensagemInicial = `${saudacaoHorario()}
 Bem-vindo ao atendimento seguro.
 Protocolo: ${protocolo}
@@ -59,7 +54,6 @@ Por favor, digite seu primeiro nome.`;
     }
   ]);
 
-  // Mostrar saudação na tela do cliente
   const chatBox = document.getElementById("chat-box");
   const div = document.createElement("div");
   div.classList.add("mensagem", "mensagem-sistema");
@@ -67,7 +61,6 @@ Por favor, digite seu primeiro nome.`;
   chatBox.appendChild(div);
 }
 
-// Enviar mensagem do cliente
 async function enviarMensagem(texto) {
   if (!conversaId) {
     await iniciarConversa();
@@ -82,9 +75,7 @@ async function enviarMensagem(texto) {
     }
   ]);
 
-  if (error) {
-    console.error("Erro ao enviar mensagem:", error);
-  } else {
+  if (!error) {
     const chatBox = document.getElementById("chat-box");
     const div = document.createElement("div");
     div.classList.add("mensagem", "mensagem-cliente");
@@ -93,7 +84,6 @@ async function enviarMensagem(texto) {
   }
 }
 
-// Configura botão
 document.getElementById("enviarMensagem").addEventListener("click", () => {
   const input = document.getElementById("mensagem");
   const texto = input.value.trim();
@@ -103,7 +93,6 @@ document.getElementById("enviarMensagem").addEventListener("click", () => {
   }
 });
 
-// Enter também envia
 document.getElementById("mensagem").addEventListener("keypress", (event) => {
   if (event.key === "Enter") {
     event.preventDefault();
@@ -122,20 +111,23 @@ supabaseClient
     'postgres_changes',
     { event: 'INSERT', schema: 'public', table: 'mensagens' },
     (payload) => {
-      console.log("Nova mensagem recebida:", payload.new);
-
       if (payload.new.remetente === "atendente" && payload.new.conversa_id === conversaId) {
         const chatBox = document.getElementById("chat-box");
         const div = document.createElement("div");
         div.classList.add("mensagem", "mensagem-admin");
-        div.innerHTML = `<p>${payload.new.mensagem}</p><small>${new Date(payload.new.criado_em).toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo" })}</small>`;
+        div.innerHTML = `
+          <img src="avatar.png" class="avatar">
+          <div>
+            <p>${payload.new.mensagem}</p>
+            <small>${new Date(payload.new.criado_em).toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo" })}</small>
+          </div>
+        `;
         chatBox.appendChild(div);
       }
     }
   )
   .subscribe();
 
-// Inicia conversa ao abrir
 window.onload = async () => {
   await iniciarConversa();
 };
