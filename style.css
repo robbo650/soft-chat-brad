@@ -67,6 +67,12 @@ header .logo { width: 40px; height: auto; }
 .mensagem-admin {
   background: #e0e0e0;
   margin-right: auto;
+  display: flex;              /* 🔹 avatar + texto lado a lado */
+  align-items: center;
+  gap: 8px;                   /* espaço entre avatar e texto */
+}
+.mensagem-admin p {
+  margin: 0;
 }
 .mensagem-sistema {
   background: #d9d9d9;
@@ -83,6 +89,15 @@ header .logo { width: 40px; height: auto; }
   display: block;
   margin-top: 3px;
   text-align: right;
+}
+
+/* Avatar do atendente */
+.avatar {
+  width: 28px;   /* 🔹 tamanho pequeno */
+  height: 28px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  object-fit: cover; /* 🔹 garante que não distorce */
 }
 
 /* Rodapé */
