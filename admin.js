@@ -1,17 +1,20 @@
 const { createClient } = supabase;
 
-const supabaseUrl = "https://ogvhrkptvvtiddqumdqh.supabase.co"; // Project URL do painel
+const supabaseUrl = "https://ogvhrkptvvtiddqumdqh.supabase.co"; // Project URL
 const supabaseKey = "sb_publishable_Uu2hqzHDVy4ds2xc-quI8g_jceg9J3C"; // Publishable key (anon)
 const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
-
 let conversaSelecionada = null;
 
-// Carregar conversas existentes
+// ⚠️ Defina aqui o UUID do atendente logado (pegue da tabela atendentes)
+const atendenteId = "193287e7-45e4-4142-9478-0c3cf8a8db5f"; // exemplo Brad 01
+
+// Carregar conversas sem atendente
 async function carregarConversas() {
   const { data, error } = await supabaseClient
     .from('conversas')
     .select('*')
+    .is('atendente_id', null) // só mostra conversas pendentes
     .order('criado_em', { ascending: false });
 
   if (error) {
@@ -35,6 +38,13 @@ async function carregarConversas() {
 // Selecionar conversa e mostrar mensagens
 async function selecionarConversa(id) {
   conversaSelecionada = id;
+
+  // vincula atendente à conversa
+  await supabaseClient
+    .from("conversas")
+    .update({ atendente_id: atendenteId })
+    .eq("id", id);
+
   const { data, error } = await supabaseClient
     .from('mensagens')
     .select('*')
@@ -76,7 +86,6 @@ async function enviarResposta(texto) {
   if (error) {
     console.error("Erro ao enviar resposta:", error);
   } else {
-    // adiciona direto na tela sem recarregar tudo
     const mensagensBox = document.getElementById("mensagens");
     const div = document.createElement("div");
     div.classList.add("mensagem", "mensagem-admin");
@@ -114,6 +123,8 @@ supabaseClient
     'postgres_changes',
     { event: 'INSERT', schema: 'public', table: 'mensagens' },
     (payload) => {
+      console.log("Nova mensagem recebida:", payload.new);
+
       if (payload.new.remetente === "cliente" && payload.new.conversa_id === conversaSelecionada) {
         const mensagensBox = document.getElementById("mensagens");
         const div = document.createElement("div");
@@ -128,16 +139,4 @@ supabaseClient
 // Carregar conversas ao abrir
 window.onload = async () => {
   await carregarConversas();
-
-  const { data, error } = await supabaseClient
-    .from('conversas')
-    .select('id')
-    .order('criado_em', { ascending: false })
-    .limit(1);
-
-  if (!error && data.length > 0) {
-    conversaSelecionada = data[0].id;
-    selecionarConversa(conversaSelecionada);
-  }
 };
-
