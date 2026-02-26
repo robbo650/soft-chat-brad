@@ -1,7 +1,7 @@
 const { createClient } = supabase;
 
-const supabaseUrl = "https://ogvhrkptvvtiddqumdqh.supabase.co"; // Project URL
-const supabaseKey = "sb_publishable_Uu2hqzHDVy4ds2xc-quI8g_jceg9J3C"; // Publishable key (anon)
+const supabaseUrl = "https://ogvhrkptvvtiddqumdqh.supabase.co"; 
+const supabaseKey = "sb_publishable_Uu2hqzHDVy4ds2xc-quI8g_jceg9J3C"; 
 const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
 let conversaId = null;
@@ -21,6 +21,23 @@ async function iniciarConversa() {
 
   conversaId = data[0].id;
   console.log("Conversa iniciada com ID:", conversaId);
+
+  // Saudação automática com protocolo
+  await supabaseClient.from('mensagens').insert([
+    {
+      conversa_id: conversaId,
+      remetente: "sistema",
+      mensagem: "Bem-vindo ao atendimento seguro. Protocolo: " + conversaId,
+      criado_em: new Date().toISOString()
+    }
+  ]);
+
+  // Mostrar saudação na tela do cliente
+  const chatBox = document.getElementById("chat-box");
+  const div = document.createElement("div");
+  div.classList.add("mensagem", "mensagem-sistema");
+  div.innerHTML = `<p>Bem-vindo ao atendimento seguro.<br>Protocolo: ${conversaId}</p><small>${new Date().toLocaleTimeString("pt-BR")}</small>`;
+  chatBox.appendChild(div);
 }
 
 // Enviar mensagem do cliente
