@@ -68,7 +68,7 @@ header .logo { width: 40px; height: auto; }
   background: #e0e0e0;
   margin-right: auto;
   display: flex;              /* 🔹 avatar + texto lado a lado */
-  align-items: center;
+  align-items: flex-start;    /* 🔹 avatar alinhado ao topo da mensagem */
   gap: 8px;                   /* espaço entre avatar e texto */
 }
 .mensagem-admin p {
