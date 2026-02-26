@@ -1,7 +1,7 @@
 const { createClient } = supabase;
 
-const supabaseUrl = "https://ogvhrkptvvtiddqumdqh.supabase.co"; // Project URL
-const supabaseKey = "sb_publishable_Uu2hqzHDVy4ds2xc-quI8g_jceg9J3C"; // Publishable key (anon)
+const supabaseUrl = "https://ogvhrkptvvtiddqumdqh.supabase.co"; 
+const supabaseKey = "sb_publishable_Uu2hqzHDVy4ds2xc-quI8g_jceg9J3C"; 
 const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
 let conversaSelecionada = null;
