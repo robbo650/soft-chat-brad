@@ -1,15 +1,17 @@
 const { createClient } = supabase;
 
-const supabaseUrl = "https://ogvhrkptvvtiddqumdqh.supabase.co"; // Project URL (copiado do painel)
+const supabaseUrl = "https://ogvhrkptvvtiddqumdqh.supabase.co"; // Project URL
 const supabaseKey = "sb_publishable_Uu2hqzHDVy4ds2xc-quI8g_jceg9J3C"; // Publishable key (anon)
 const supabaseClient = createClient(supabaseUrl, supabaseKey);
+
 let conversaId = null;
+const clienteId = crypto.randomUUID(); // gera ID único para cada cliente
 
 // Criar nova conversa ao abrir
 async function iniciarConversa() {
   const { data, error } = await supabaseClient
     .from('conversas')
-    .insert([{ cliente_id: "cliente", criado_em: new Date().toISOString() }])
+    .insert([{ cliente_id: clienteId, criado_em: new Date().toISOString() }])
     .select();
 
   if (error) {
@@ -18,6 +20,7 @@ async function iniciarConversa() {
   }
 
   conversaId = data[0].id;
+  console.log("Conversa iniciada com ID:", conversaId);
 }
 
 // Enviar mensagem do cliente
@@ -75,6 +78,8 @@ supabaseClient
     'postgres_changes',
     { event: 'INSERT', schema: 'public', table: 'mensagens' },
     (payload) => {
+      console.log("Nova mensagem recebida:", payload.new);
+
       if (payload.new.remetente === "atendente" && payload.new.conversa_id === conversaId) {
         const chatBox = document.getElementById("chat-box");
         const div = document.createElement("div");
@@ -90,4 +95,3 @@ supabaseClient
 window.onload = async () => {
   await iniciarConversa();
 };
-
