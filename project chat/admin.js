@@ -50,8 +50,19 @@ async function selecionarConversa(id) {
   data.forEach(msg => {
     const div = document.createElement("div");
     div.classList.add("mensagem");
-    div.classList.add(msg.remetente === "cliente" ? "mensagem-cliente" : "mensagem-admin");
-    div.innerHTML = `<p>${msg.mensagem}</p><small>${new Date(msg.criado_em).toLocaleTimeString("pt-BR")}</small>`;
+    if (msg.remetente === "cliente") {
+      div.classList.add("mensagem-cliente");
+      div.innerHTML = `<p>${msg.mensagem}</p><small>${new Date(msg.criado_em).toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo" })}</small>`;
+    } else {
+      div.classList.add("mensagem-admin");
+      div.innerHTML = `
+        <img src="avatar.png" class="avatar">
+        <div>
+          <p>${msg.mensagem}</p>
+          <small>${new Date(msg.criado_em).toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo" })}</small>
+        </div>
+      `;
+    }
     mensagensBox.appendChild(div);
   });
 }
