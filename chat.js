@@ -5,7 +5,29 @@ const supabaseKey = "sb_publishable_Uu2hqzHDVy4ds2xc-quI8g_jceg9J3C";
 const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
 let conversaId = null;
-const clienteId = crypto.randomUUID(); // gera ID único para cada cliente
+const clienteId = crypto.randomUUID(); // ID único para cada cliente
+const protocolo = gerarProtocolo();    // protocolo numérico dinâmico
+
+// Função para gerar protocolo numérico
+function gerarProtocolo() {
+  const agora = new Date();
+  const protocolo = agora.getFullYear().toString().slice(-2) + // ano (26)
+                    (agora.getMonth()+1).toString().padStart(2,"0") + // mês
+                    agora.getDate().toString().padStart(2,"0") + // dia
+                    agora.getHours().toString().padStart(2,"0") +
+                    agora.getMinutes().toString().padStart(2,"0") +
+                    agora.getSeconds().toString().padStart(2,"0") +
+                    Math.floor(Math.random()*1000).toString().padStart(3,"0");
+  return protocolo; 
+}
+
+// Função para saudação conforme horário
+function saudacaoHorario() {
+  const hora = new Date().getHours();
+  if (hora < 12) return "Bom dia,";
+  if (hora < 18) return "Boa tarde,";
+  return "Boa noite,";
+}
 
 // Criar nova conversa ao abrir
 async function iniciarConversa() {
@@ -22,12 +44,17 @@ async function iniciarConversa() {
   conversaId = data[0].id;
   console.log("Conversa iniciada com ID:", conversaId);
 
-  // Saudação automática com protocolo
+  // Saudação automática com protocolo e pedido do nome
+  const mensagemInicial = `${saudacaoHorario()}
+Bem-vindo ao atendimento seguro.
+Protocolo: ${protocolo}
+Por favor, digite seu primeiro nome.`;
+
   await supabaseClient.from('mensagens').insert([
     {
       conversa_id: conversaId,
       remetente: "sistema",
-      mensagem: "Bem-vindo ao atendimento seguro. Protocolo: " + conversaId,
+      mensagem: mensagemInicial,
       criado_em: new Date().toISOString()
     }
   ]);
@@ -36,7 +63,7 @@ async function iniciarConversa() {
   const chatBox = document.getElementById("chat-box");
   const div = document.createElement("div");
   div.classList.add("mensagem", "mensagem-sistema");
-  div.innerHTML = `<p>Bem-vindo ao atendimento seguro.<br>Protocolo: ${conversaId}</p><small>${new Date().toLocaleTimeString("pt-BR")}</small>`;
+  div.innerHTML = `<p>${mensagemInicial.replace(/\n/g,"<br>")}</p><small>${new Date().toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo" })}</small>`;
   chatBox.appendChild(div);
 }
 
@@ -61,7 +88,7 @@ async function enviarMensagem(texto) {
     const chatBox = document.getElementById("chat-box");
     const div = document.createElement("div");
     div.classList.add("mensagem", "mensagem-cliente");
-    div.innerHTML = `<p>${texto}</p><small>${new Date().toLocaleTimeString("pt-BR")}</small>`;
+    div.innerHTML = `<p>${texto}</p><small>${new Date().toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo" })}</small>`;
     chatBox.appendChild(div);
   }
 }
@@ -101,7 +128,7 @@ supabaseClient
         const chatBox = document.getElementById("chat-box");
         const div = document.createElement("div");
         div.classList.add("mensagem", "mensagem-admin");
-        div.innerHTML = `<p>${payload.new.mensagem}</p><small>${new Date(payload.new.criado_em).toLocaleTimeString("pt-BR")}</small>`;
+        div.innerHTML = `<p>${payload.new.mensagem}</p><small>${new Date(payload.new.criado_em).toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo" })}</small>`;
         chatBox.appendChild(div);
       }
     }
