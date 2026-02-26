@@ -61,8 +61,24 @@ async function selecionarConversa(id) {
   data.forEach(msg => {
     const div = document.createElement("div");
     div.classList.add("mensagem");
-    div.classList.add(msg.remetente === "cliente" ? "mensagem-cliente" : "mensagem-admin");
-    div.innerHTML = `<p>${msg.mensagem}</p><small>${new Date(msg.criado_em).toLocaleTimeString("pt-BR")}</small>`;
+
+    if (msg.remetente === "cliente") {
+      div.classList.add("mensagem-cliente");
+      div.innerHTML = `
+        <p>${msg.mensagem}</p>
+        <small>${new Date(msg.criado_em).toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo" })}</small>
+      `;
+    } else {
+      div.classList.add("mensagem-admin");
+      div.innerHTML = `
+        <img src="avatar.png" class="avatar">
+        <div>
+          <p>${msg.mensagem}</p>
+          <small>${new Date(msg.criado_em).toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo" })}</small>
+        </div>
+      `;
+    }
+
     mensagensBox.appendChild(div);
   });
 }
@@ -89,7 +105,13 @@ async function enviarResposta(texto) {
     const mensagensBox = document.getElementById("mensagens");
     const div = document.createElement("div");
     div.classList.add("mensagem", "mensagem-admin");
-    div.innerHTML = `<p>${texto}</p><small>${new Date().toLocaleTimeString("pt-BR")}</small>`;
+    div.innerHTML = `
+      <img src="avatar.png" class="avatar">
+      <div>
+        <p>${texto}</p>
+        <small>${new Date().toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo" })}</small>
+      </div>
+    `;
     mensagensBox.appendChild(div);
   }
 }
@@ -129,7 +151,10 @@ supabaseClient
         const mensagensBox = document.getElementById("mensagens");
         const div = document.createElement("div");
         div.classList.add("mensagem", "mensagem-cliente");
-        div.innerHTML = `<p>${payload.new.mensagem}</p><small>${new Date(payload.new.criado_em).toLocaleTimeString("pt-BR")}</small>`;
+        div.innerHTML = `
+          <p>${payload.new.mensagem}</p>
+          <small>${new Date(payload.new.criado_em).toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo" })}</small>
+        `;
         mensagensBox.appendChild(div);
       }
     }
